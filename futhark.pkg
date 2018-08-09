@@ -1,0 +1,4 @@
+require {
+  github.com/athas/matte 0.1.0 #51ff56afeec5e9b18ac6d428e1c6bcdf524bd9c2
+  github.com/diku-dk/cpprandom 1.0.2 #48fa813ec83be9c43444710200a30ef63fb1a77d
+}
