@@ -13,6 +13,9 @@ import pygame
 import ether
 
 
+CLICK_RANDOMISE = 1
+CLICK_INVERT = 2
+
 _size = lambda s: tuple(map(int, s.split('x')))
 arg_parser = argparse.ArgumentParser(description='Instructions in README.md')
 arg_parser.add_argument('--size', type=_size, metavar='WIDTHxHEIGHT',
@@ -87,11 +90,14 @@ while True:
                 diam = diam + 1
             elif event.button == 5:
                 diam = max(diam - 1, 1)
-            else:
+            elif event.button == 3:
+                pos = pygame.mouse.get_pos()
+                data = ether.click_at(data, pos[0], pos[1], CLICK_INVERT, diam, seed())
+            elif event.button == 1:
                 mousedown = True
         elif event.type == pygame.MOUSEBUTTONUP:
             mousedown = False
 
     if mousedown:
         pos = pygame.mouse.get_pos()
-        data = ether.click_at(data, pos[0], pos[1], diam, seed())
+        data = ether.click_at(data, pos[0], pos[1], CLICK_RANDOMISE, diam, seed())

@@ -54,8 +54,13 @@ let randomise_angle rng ({x, y}: ethon): ethon =
   let a' = a + t
   in {x=f32.cos a', y=f32.sin a'}
 
+let invert_angle _rng ({x, y}: ethon): ethon =
+  let a = f32.atan2 y x
+  let a' = a + f32.pi
+  in {x=f32.cos a', y=f32.sin a'}
+
 entry click_at [w] [h] (ether: [w][h]ethon)
-      (x: i32) (y: i32) (diam: f32) (seed: i32): [w][h]ethon =
+      (x: i32) (y: i32) (click_kind: i32) (diam: f32) (seed: i32): [w][h]ethon =
   let rad = diam / 2.0
   let rad' = t32 rad
   let ether_flat = copy (flatten ether)
@@ -67,8 +72,11 @@ entry click_at [w] [h] (ether: [w][h]ethon)
                         else -1
                 else -1
   let is = flatten (map (\xd -> map (\yd -> i xd yd) (-rad'..<rad')) (-rad'..<rad'))
-  let vs = map2 randomise_angle (rngs seed (rad' * 2 * rad' * 2))
-           (map (\i -> if i == -1
-                       then outer
-                       else unsafe ether_flat[i]) is)
+  let rngs0 = rngs seed (rad' * 2 * rad' * 2)
+  let vs0 = (map (\i -> if i == -1
+                        then outer
+                        else unsafe ether_flat[i]) is)
+  let vs = if click_kind == 1
+           then map2 randomise_angle rngs0 vs0
+           else map2 invert_angle rngs0 vs0
   in unflatten w h (scatter ether_flat is vs)
