@@ -19,7 +19,9 @@ let outer: ethon = {x= -1.0, y=0.0}
 
 let charge_ethon ul um ur ml mr ll lm lr =
   let dir = ul vec2.+ um vec2.+ ur vec2.+ ml vec2.+ mr vec2.+ ll vec2.+ lm vec2.+ lr
-  in vec2.normalise dir
+  in if vec2.norm dir > 0.0
+     then vec2.normalise dir
+     else {x=0.0, y=0.0}
 
 entry step [w] [h]
       (ether: [w][h]ethon):
