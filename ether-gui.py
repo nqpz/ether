@@ -96,7 +96,8 @@ while True:
             elif event.button == 1:
                 mousedown = True
         elif event.type == pygame.MOUSEBUTTONUP:
-            mousedown = False
+            if event.button == 1:
+                mousedown = False
 
     if mousedown:
         pos = pygame.mouse.get_pos()
