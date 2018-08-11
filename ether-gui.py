@@ -38,7 +38,7 @@ show_stats = True
 seed = lambda: random.randrange(2**31)
 
 data = ether.initial_ether(size[0], size[1], seed())
-diam = 100.0
+diam = 200.0
 
 def show_text(what, where):
     text = font.render(what, 1, (255, 255, 255))
