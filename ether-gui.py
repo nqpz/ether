@@ -35,6 +35,7 @@ show_stats = True
 seed = lambda: random.randrange(2**31)
 
 data = ether.initial_ether(size[0], size[1], seed())
+diam = 100.0
 
 def show_text(what, where):
     text = font.render(what, 1, (255, 255, 255))
@@ -60,6 +61,7 @@ def render():
         texts.extend([
             ' Futhark step: {:.02f} ms'.format((step_end - step_start) * 1000),
             ' Futhark render: {:.02f} ms'.format((render_end - render_start) * 1000),
+            ' Brush diameter: {:.02f}'.format(diam),
             ' FPS: {:.02f}'.format(clock.get_fps()),
         ])
     for text, i in zip(texts, range(len(texts))):
@@ -81,10 +83,15 @@ while True:
             elif event.key == pygame.K_q or event.key == pygame.K_ESCAPE:
                 sys.exit()
         elif event.type == pygame.MOUSEBUTTONDOWN:
-            mousedown = True
+            if event.button == 4:
+                diam = diam + 1
+            elif event.button == 5:
+                diam = max(diam - 1, 1)
+            else:
+                mousedown = True
         elif event.type == pygame.MOUSEBUTTONUP:
             mousedown = False
 
     if mousedown:
         pos = pygame.mouse.get_pos()
-        data = ether.click_at(data, pos[0], pos[1], seed())
+        data = ether.click_at(data, pos[0], pos[1], diam, seed())
