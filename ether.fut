@@ -22,10 +22,16 @@ let charge_ethon ul um ur ml mr ll lm lr =
      then vec2.normalise dir
      else {x=0.0, y=0.0}
 
+let turn_ethon (dir: ethon): ethon =
+  let angle = f32.atan2 dir.y dir.x
+  let angle' = angle + 0.01
+  in {x=f32.cos angle', y=f32.sin angle'}
+
 entry step [w] [h]
       (ether: [w][h]ethon):
       [w][h]ethon =
-  stencil charge_ethon ether outer
+  let ether' = map (map turn_ethon) ether
+  in stencil charge_ethon ether' outer
 
 let render_ethon (dir: ethon): pixel =
   let angle = f32.atan2 dir.y dir.x
