@@ -1,15 +1,14 @@
-import "/futlib/vector"
-
 import "functions/stencil"
 import "functions/hsl"
 
 import "lib/github.com/athas/matte/colour"
+import "lib/github.com/athas/vector/vspace"
 import "lib/github.com/diku-dk/cpprandom/random"
 
 
-module vec2 = mk_vec2 f32
+module vec2 = mk_vspace_2d f32
 
-type ethon = vec2.vec
+type ethon = vec2.vector
 type pixel = argb_colour.colour
 
 module dist = uniform_real_distribution f32 minstd_rand
