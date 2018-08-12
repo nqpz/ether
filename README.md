@@ -1,6 +1,6 @@
 # ether
 
-![Screenshot](http://hongabar.org/~niels/ether1.png)
+![Screenshot](http://hongabar.org/~niels/ether2.png)
 
 I'm not really sure yet.
 
