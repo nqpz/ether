@@ -15,8 +15,6 @@ module dist = uniform_real_distribution f32 minstd_rand
 module norm_dist = normal_distribution f32 minstd_rand
 module shuffle = mk_shuffle minstd_rand
 
-let outer: ethon = {x= -1.0, y=0.0}
-
 let charge_ethon ul um ur ml mr ll lm lr =
   let dir = vec2.(ul + um + ur + ml + mr + ll + lm + lr)
   in if vec2.norm dir > 0.0
@@ -82,7 +80,7 @@ entry click_at [w] [h] (ether: [w][h]ethon)
   let is = flatten (map (\xd -> map (\yd -> i xd yd) (-rad'..<rad')) (-rad'..<rad'))
   let rngs0 = rngs seed (rad' * 2 * rad' * 2)
   let vs0 = (map (\i -> if i == -1
-                        then outer
+                        then {x=0, y=0}
                         else unsafe ether_flat[i]) is)
   let vs = if click_kind == 1
            then map2 randomise_angle rngs0 vs0
