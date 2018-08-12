@@ -74,9 +74,10 @@ def render():
 
     pygame.display.flip()
 
-mousedown = False
-invertdown = False
+leftmousedown = False
+rightmousedown = False
 lastinvert = time.time()
+orgpos = (0,0)
 while True:
     clock.tick()
 
@@ -99,20 +100,23 @@ while True:
             elif event.button == 5:
                 diam = max(diam - 1, 1)
             elif event.button == 3:
-                invertdown = True
+                rightmousedown = True
             elif event.button == 1:
-                mousedown = True
+                leftmousedown = True
+                orgpos = pygame.mouse.get_pos()
         elif event.type == pygame.MOUSEBUTTONUP:
             if event.button == 1:
-                mousedown = False
+                leftmousedown = False
             elif event.button == 3:
-                invertdown = False
-
-    if mousedown:
+                rightmousedown = False
+    
+    if leftmousedown and rightmousedown:
+        pos = pygame.mouse.get_pos()
+        data = ether.colour_at(data, orgpos[0], orgpos[1], pos[0], pos[1], diam)
+    elif leftmousedown:
         pos = pygame.mouse.get_pos()
         data = ether.click_at(data, pos[0], pos[1], CLICK_RANDOMISE, diam, seed())
-    
-    if invertdown:
+    elif rightmousedown:
         if time.time() - lastinvert > 0.2:
             pos = pygame.mouse.get_pos()
             data = ether.click_at(data, pos[0], pos[1], CLICK_INVERT, diam, seed())
