@@ -135,3 +135,12 @@ entry colour_at [w] [h] (ether: [w][h]ethon)
 entry shuffle_ethons [w] [h] (ether: [w][h]ethon) (seed: i32): [w][h]ethon =
   let rngs = rngs seed (w*h) |> unflatten w h
   in map2 shuffle.shuffle' rngs ether |> map (.2)
+
+let randomise_spin rng (e: ethon): ethon =
+  let (_rng, spin) = norm_dist.rand {mean=0, stddev=0.05} rng
+  in {dir=e.dir,
+      spin=spin}
+
+entry randomise_spins [w] [h] (ether: [w][h]ethon) (seed: i32): [w][h]ethon =
+  let rngs = rngs seed (w*h) |> unflatten w h
+  in map2 (map2 randomise_spin) rngs ether
