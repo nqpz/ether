@@ -116,7 +116,7 @@ while True:
             elif event.button == 2:
                 leftmousedown = False
                 rightmousedown = False
-    
+
     if leftmousedown and rightmousedown:
         pos = pygame.mouse.get_pos()
         data = ether.colour_at(data, orgpos[0], orgpos[1], pos[0], pos[1], diam)
