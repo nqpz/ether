@@ -73,10 +73,7 @@ let invert_angle _rng (e: ethon): ethon =
       spin=e.spin}
 
 let colour_from (efrom: ethon) (e: ethon): ethon =
-  let a = f32.atan2 efrom.dir.y efrom.dir.x
-  --let b = f32.atan2 e.dir.y e.dir.x
-  let b' = a
-  in {dir={x=f32.cos b', y=f32.sin b'},
+  {dir={x=efrom.dir.y, y=efrom.dir.x},
       spin=e.spin}
 
 entry click_at [w] [h] (ether: [w][h]ethon)
@@ -128,7 +125,6 @@ entry colour_at [w] [h] (ether: [w][h]ethon)
   let fs0 = (map (\f -> if f == -1
                         then {dir={x=0, y=0}, spin=0}
                         else unsafe ether_flat[f]) fs)
---  let efrom = {dir={x=xfrom, y=yfrom}, spin=ether[xfrom][}
   let vs = map2 colour_from fs0 vs0
   in unflatten w h (scatter ether_flat is vs)
 
