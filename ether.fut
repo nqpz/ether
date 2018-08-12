@@ -12,9 +12,10 @@ type ethon = {dir: vec2.vector,
               spin: f32}
 type pixel = argb_colour.colour
 
-module dist = uniform_real_distribution f32 minstd_rand
-module norm_dist = normal_distribution f32 minstd_rand
-module shuffle = mk_shuffle minstd_rand
+module rng = xorshift128plus
+module dist = uniform_real_distribution f32 rng
+module norm_dist = normal_distribution f32 rng
+module shuffle = mk_shuffle rng
 
 let charge_ethon (ul: ethon) (um: ethon) (ur: ethon) (ml: ethon) (mm: ethon) (mr: ethon) (ll: ethon) (lm: ethon) (lr: ethon): ethon =
   let dir = vec2.(ul.dir + um.dir + ur.dir + ml.dir + mr.dir + ll.dir + lm.dir + lr.dir)
@@ -50,8 +51,8 @@ entry render [w] [h]
   map (map render_ethon) ether
 
 let rngs seed n =
-  let rng = minstd_rand.rng_from_seed [seed]
-  in minstd_rand.split_rng n rng
+  let rng = rng.rng_from_seed [seed]
+  in rng.split_rng n rng
 
 let random_ethon rng: ethon =
   let (rng, a) = dist.rand (0.0, 2.0 * f32.pi) rng
