@@ -85,6 +85,8 @@ while True:
         elif event.type == pygame.KEYDOWN:
             if event.key == pygame.K_h:
                 show_stats = not show_stats
+            if event.key == pygame.K_r:
+                data = ether.shuffle_ethons(data, seed())
             elif event.key == pygame.K_q or event.key == pygame.K_ESCAPE:
                 sys.exit()
         elif event.type == pygame.MOUSEBUTTONDOWN:
