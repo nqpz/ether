@@ -4,7 +4,7 @@ import "functions/hsl"
 import "lib/github.com/athas/matte/colour"
 import "lib/github.com/athas/vector/vspace"
 import "lib/github.com/diku-dk/cpprandom/random"
-
+import "lib/github.com/diku-dk/cpprandom/shuffle"
 
 module vec2 = mk_vspace_2d f32
 
@@ -13,6 +13,7 @@ type pixel = argb_colour.colour
 
 module dist = uniform_real_distribution f32 minstd_rand
 module norm_dist = normal_distribution f32 minstd_rand
+module shuffle = mk_shuffle minstd_rand
 
 let outer: ethon = {x= -1.0, y=0.0}
 
@@ -87,3 +88,6 @@ entry click_at [w] [h] (ether: [w][h]ethon)
            then map2 randomise_angle rngs0 vs0
            else map2 invert_angle rngs0 vs0
   in unflatten w h (scatter ether_flat is vs)
+
+entry shuffle_ethons [w] [h] (ether: [w][h]ethon) (seed: i32): [w][h]ethon =
+  unflatten w h (shuffle.shuffle' (rngs seed (w*h)) (flatten ether)).2
