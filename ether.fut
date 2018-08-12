@@ -32,8 +32,8 @@ let turn_ethon (e: ethon): ethon =
 entry step [w] [h]
       (ether: [w][h]ethon):
       [w][h]ethon =
-  let ether' = map (map turn_ethon) ether
-  in stencil_wraparound charge_ethon ether'
+  stencil_wraparound charge_ethon ether |>
+  map (map turn_ethon)
 
 let render_ethon (e: ethon): pixel =
   let angle = f32.atan2 e.dir.y e.dir.x
