@@ -104,10 +104,17 @@ while True:
             elif event.button == 1:
                 leftmousedown = True
                 orgpos = pygame.mouse.get_pos()
+            elif event.button == 2:
+                leftmousedown = True
+                rightmousedown = True
+                orgpos = pygame.mouse.get_pos()
         elif event.type == pygame.MOUSEBUTTONUP:
             if event.button == 1:
                 leftmousedown = False
             elif event.button == 3:
+                rightmousedown = False
+            elif event.button == 2:
+                leftmousedown = False
                 rightmousedown = False
     
     if leftmousedown and rightmousedown:
