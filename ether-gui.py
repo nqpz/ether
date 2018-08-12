@@ -119,7 +119,8 @@ while True:
 
     if leftmousedown and rightmousedown:
         pos = pygame.mouse.get_pos()
-        data = ether.colour_at(data, orgpos[0], orgpos[1], pos[0], pos[1], diam)
+        if pos != orgpos:
+            data = ether.colour_at(data, orgpos[0], orgpos[1], pos[0], pos[1], diam)
     elif leftmousedown:
         pos = pygame.mouse.get_pos()
         data = ether.click_at(data, pos[0], pos[1], CLICK_RANDOMISE, diam, seed())
