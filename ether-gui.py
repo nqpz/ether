@@ -34,6 +34,7 @@ clock = pygame.time.Clock()
 font = pygame.font.SysFont('DejaVu Sans Mono, monospace', 18, bold=True)
 
 show_stats = True
+show_stats_fully = True
 
 seed = lambda: random.randrange(2**31)
 
@@ -59,16 +60,17 @@ def render():
     screen.blit(surface, (0, 0))
 
     texts = []
-    texts.append('(Press h to hide/show stats)')
-    if show_stats:
-        texts.extend([
-            ' Futhark step: {:.02f} ms'.format((step_end - step_start) * 1000),
-            ' Futhark render: {:.02f} ms'.format((render_end - render_start) * 1000),
-            ' Brush diameter: {:.02f}'.format(diam),
-            ' FPS: {:.02f}'.format(clock.get_fps()),
-        ])
-    for text, i in zip(texts, range(len(texts))):
-        show_text(text, (10, 10 + i * 20))
+    if show_stats_fully:
+        texts.append('(Press h to hide/show stats)')
+        if show_stats:
+            texts.extend([
+                ' Futhark step: {:.02f} ms'.format((step_end - step_start) * 1000),
+                ' Futhark render: {:.02f} ms'.format((render_end - render_start) * 1000),
+                ' Brush diameter: {:.02f}'.format(diam),
+                ' FPS: {:.02f}'.format(clock.get_fps()),
+            ])
+        for text, i in zip(texts, range(len(texts))):
+            show_text(text, (10, 10 + i * 20))
 
     pygame.display.flip()
 
@@ -85,6 +87,8 @@ while True:
         elif event.type == pygame.KEYDOWN:
             if event.key == pygame.K_h:
                 show_stats = not show_stats
+            if event.key == pygame.K_g:
+                show_stats_fully = not show_stats_fully
             if event.key == pygame.K_r:
                 data = ether.shuffle_ethons(data, seed())
             elif event.key == pygame.K_q or event.key == pygame.K_ESCAPE:
