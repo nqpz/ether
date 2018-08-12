@@ -90,4 +90,5 @@ entry click_at [w] [h] (ether: [w][h]ethon)
   in unflatten w h (scatter ether_flat is vs)
 
 entry shuffle_ethons [w] [h] (ether: [w][h]ethon) (seed: i32): [w][h]ethon =
-  unflatten w h (shuffle.shuffle' (rngs seed (w*h)) (flatten ether)).2
+  let rngs = rngs seed (w*h) |> unflatten w h
+  in map2 shuffle.shuffle' rngs ether |> map (.2)
