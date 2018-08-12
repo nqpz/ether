@@ -1,5 +1,5 @@
 let stencil 'a [w] [h]
-    (f: a -> a -> a -> a -> a -> a -> a -> a -> a)
+    (f: a -> a -> a -> a -> a -> a -> a -> a -> a -> a)
     (array: [w][h]a)
     (empty: a): [w][h]a =
   let point x y =
@@ -9,6 +9,7 @@ let stencil 'a [w] [h]
            (unsafe array[x, y - 1])
            (unsafe array[x + 1, y - 1])
            (unsafe array[x - 1, y])
+           (unsafe array[x, y])
            (unsafe array[x + 1, y])
            (unsafe array[x - 1, y + 1])
            (unsafe array[x, y + 1])
@@ -16,7 +17,7 @@ let stencil 'a [w] [h]
   in map (\x -> map (\y -> point x y) (0..<h)) (0..<w)
 
 let stencil_wraparound 'a [w] [h]
-    (f: a -> a -> a -> a -> a -> a -> a -> a -> a)
+    (f: a -> a -> a -> a -> a -> a -> a -> a -> a -> a)
     (array: [w][h]a): [w][h]a =
   let point x y =
     let xm1 = if x == 0
@@ -35,6 +36,7 @@ let stencil_wraparound 'a [w] [h]
          (unsafe array[x, ym1])
          (unsafe array[xp1, ym1])
          (unsafe array[xm1, y])
+         (unsafe array[x, y])
          (unsafe array[xp1, y])
          (unsafe array[xm1, yp1])
          (unsafe array[x, yp1])
