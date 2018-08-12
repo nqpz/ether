@@ -29,11 +29,14 @@ let turn_ethon (e: ethon): ethon =
   in {dir={x=f32.cos angle', y=f32.sin angle'},
       spin=e.spin}
 
+let step' ether =
+  stencil_wraparound charge_ethon ether |>
+  map (map turn_ethon)
+
 entry step [w] [h]
       (ether: [w][h]ethon):
       [w][h]ethon =
-  stencil_wraparound charge_ethon ether |>
-  map (map turn_ethon)
+  iterate 10 step' ether
 
 let render_ethon (e: ethon): pixel =
   let angle = f32.atan2 e.dir.y e.dir.x
@@ -61,7 +64,7 @@ entry initial_ether (w: i32) (h: i32) (seed: i32): [w][h]ethon =
 
 let randomise_angle rng (e: ethon): ethon =
   let a = f32.atan2 e.dir.y e.dir.x
-  let (_rng, t) = norm_dist.rand {mean=0, stddev=1} rng
+  let (_rng, t) = norm_dist.rand {mean=0, stddev=2} rng
   let a' = a + t
   in {dir={x=f32.cos a', y=f32.sin a'},
       spin=e.spin}
