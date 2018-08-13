@@ -39,9 +39,11 @@ entry step [w] [h]
       [w][h]ethon =
   iterate 10 step' ether
 
+let ethon_angle (e: ethon): f32 =
+  f32.atan2 e.dir.y e.dir.x
+
 let render_ethon (e: ethon): pixel =
-  let angle = f32.atan2 e.dir.y e.dir.x
-  let hue = angle / (2.0 * f32.pi)
+  let hue = ethon_angle e / (2.0 * f32.pi)
   let (r, g, b) = hsl_to_rgb hue 0.5 0.5
   in argb_colour.from_rgba r g b 1.0
 
@@ -139,7 +141,7 @@ entry shuffle_ethons [w] [h] (ether: [w][h]ethon) (seed: i32): [w][h]ethon =
 import "lib/github.com/diku-dk/sorts/radix_sort"
 
 entry order_ethons [w] [h] (ether: [w][h]ethon): [w][h]ethon =
-  let order = radix_sort_by_key render_ethon i32.num_bits i32.get_bit
+  let order = radix_sort_by_key ethon_angle f32.num_bits f32.get_bit
   in map order ether
 
 let randomise_spin rng (e: ethon): ethon =
