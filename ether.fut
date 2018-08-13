@@ -136,6 +136,12 @@ entry shuffle_ethons [w] [h] (ether: [w][h]ethon) (seed: i32): [w][h]ethon =
   let rngs = rngs seed (w*h) |> unflatten w h
   in map2 shuffle.shuffle' rngs ether |> map (.2)
 
+import "lib/github.com/diku-dk/sorts/radix_sort"
+
+entry order_ethons [w] [h] (ether: [w][h]ethon): [w][h]ethon =
+  let order = radix_sort_by_key render_ethon i32.num_bits i32.get_bit
+  in map order ether
+
 let randomise_spin rng (e: ethon): ethon =
   let (_rng, spin) = norm_dist.rand {mean=0, stddev=0.05} rng
   in {dir=e.dir,

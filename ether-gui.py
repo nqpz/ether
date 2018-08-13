@@ -94,6 +94,8 @@ while True:
                 data = ether.shuffle_ethons(data, seed())
             if event.key == pygame.K_s:
                 data = ether.randomise_spins(data, seed())
+            if event.key == pygame.K_o:
+                data = ether.order_ethons(data)
             elif event.key == pygame.K_q or event.key == pygame.K_ESCAPE:
                 sys.exit()
         elif event.type == pygame.MOUSEBUTTONDOWN:
