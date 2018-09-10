@@ -1,6 +1,6 @@
 require {
   github.com/athas/matte 0.1.0 #51ff56afeec5e9b18ac6d428e1c6bcdf524bd9c2
-  github.com/diku-dk/cpprandom 1.1.0 #d5ad453c350b887908263442e4a841851eb74043
+  github.com/diku-dk/cpprandom 1.1.1 #e70c4cdbbe8f5320eb831595a92a549e164a371d
   github.com/athas/vector 0.2.1 #dec96258d786a3f82e7f774d4e5c0f5b92b0b078
   github.com/diku-dk/sorts 0.1.0 #37e9bc38ddf650ef80d9044ee7fab757179788fe
 }

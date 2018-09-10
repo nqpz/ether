@@ -12,4 +12,5 @@ lib: futhark.pkg
 	futhark-pkg sync
 
 clean:
-	rm -rf ether.py __pycache__
+	rm -f ether.py
+	rm -rf __pycache__
