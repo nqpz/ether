@@ -80,7 +80,7 @@ let invert_angle _rng (e: ethon): ethon =
 
 let colour_from (efrom: ethon) (e: ethon): ethon =
   {dir={x=efrom.dir.y, y=efrom.dir.x},
-      spin=e.spin}
+   spin=e.spin}
 
 entry click_at [w] [h] (ether: [w][h]ethon)
       (x: i32) (y: i32) (click_kind: i32) (diam: f32) (seed: i32): [w][h]ethon =
