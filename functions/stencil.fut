@@ -40,5 +40,5 @@ let stencil_wraparound 'a [w] [h]
          (unsafe array[xp1, y])
          (unsafe array[xm1, yp1])
          (unsafe array[x, yp1])
-        (unsafe array[xp1, yp1])
+         (unsafe array[xp1, yp1])
   in map (\x -> map (\y -> point x y) (0..<h)) (0..<w)
