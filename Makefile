@@ -6,10 +6,10 @@ run: ether.py
 	python3 ether-gui.py
 
 ether.py: ether.fut functions/*.fut lib
-	futhark-pyopencl --library ether.fut
+	futhark pyopencl --library ether.fut
 
 lib: futhark.pkg
-	futhark-pkg sync
+	futhark pkg sync
 
 clean:
 	rm -f ether.py
