@@ -4,7 +4,7 @@
 
 I'm not really sure yet.
 
-Requires [Futhark](http://futhark-lang.org), PyGame, and Numpy.
+Requires [Futhark](http://futhark-lang.org) and SDL.
 
 Run `make run` to run it in a window.
 

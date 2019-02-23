@@ -34,11 +34,6 @@ let step' ether =
   stencil_wraparound charge_ethon ether |>
   map (map turn_ethon)
 
-entry step [w] [h]
-      (ether: [w][h]ethon):
-      [w][h]ethon =
-  iterate 10 step' ether
-
 let ethon_angle (e: ethon): f32 =
   f32.atan2 e.dir.y e.dir.x
 
@@ -47,32 +42,26 @@ let render_ethon (e: ethon): pixel =
   let (r, g, b) = hsl_to_rgb hue 0.5 0.5
   in argb_colour.from_rgba r g b 1.0
 
-entry render [w] [h]
-      (ether: [w][h]ethon):
-      [w][h]pixel =
-  map (map render_ethon) ether
-
 let rngs seed n =
   let rng = rng.rng_from_seed [seed]
   in rng.split_rng n rng
 
-let random_ethon rng: ethon =
+let random_ethon rng: (rng.rng, ethon) =
   let (rng, a) = dist.rand (0.0, 2.0 * f32.pi) rng
-  let (_rng, spin) = norm_dist.rand {mean=0, stddev=0.05} rng
-  in {dir={x=f32.cos a, y=f32.sin a},
-      spin=spin}
+  let (rng, spin) = norm_dist.rand {mean=0, stddev=0.05} rng
+  in (rng,
+      {dir={x=f32.cos a, y=f32.sin a},
+       spin=spin})
 
-entry initial_ether (w: i32) (h: i32) (seed: i32): [w][h]ethon =
-  copy (unflatten w h (map random_ethon (rngs seed (w * h))))
-
-let randomise_angle rng (e: ethon): ethon =
+let randomise_angle rng (e: ethon): (rng.rng, ethon) =
   let a = f32.atan2 e.dir.y e.dir.x
-  let (_rng, t) = norm_dist.rand {mean=0, stddev=2} rng
+  let (rng, t) = norm_dist.rand {mean=0, stddev=2} rng
   let a' = a + t
-  in {dir={x=f32.cos a', y=f32.sin a'},
-      spin=e.spin}
+  in (rng,
+      {dir={x=f32.cos a', y=f32.sin a'},
+       spin=e.spin})
 
-let invert_angle _rng (e: ethon): ethon =
+let invert_angle (e: ethon): ethon =
   let a = f32.atan2 e.dir.y e.dir.x
   let a' = a + f32.pi
   in {dir={x=f32.cos a', y=f32.sin a'},
@@ -82,8 +71,10 @@ let colour_from (efrom: ethon) (e: ethon): ethon =
   {dir={x=efrom.dir.y, y=efrom.dir.x},
    spin=e.spin}
 
-entry click_at [w] [h] (ether: [w][h]ethon)
-      (x: i32) (y: i32) (click_kind: i32) (diam: f32) (seed: i32): [w][h]ethon =
+type click_kind = #randomise | #invert
+
+let click_at [h][w] (ether: [h][w]ethon)
+      (x: i32) (y: i32) (click_kind: click_kind) (diam: f32) (rng: rng.rng): (rng.rng, [h][w]ethon) =
   let rad = diam / 2.0
   let rad' = t32 rad
   let ether_flat = copy (flatten ether)
@@ -91,21 +82,23 @@ entry click_at [w] [h] (ether: [w][h]ethon)
                 then let x' = x + xd
                      let y' = y + yd
                      in if x' >= 0 && x' < w && y' >= 0 && y' < h
-                        then x' * h + y'
+                        then y' * w + x'
                         else -1
                 else -1
   let is = flatten (map (\xd -> map (\yd -> i xd yd) (-rad'..<rad')) (-rad'..<rad'))
-  let rngs0 = rngs seed (rad' * 2 * rad' * 2)
+  let rngs0 = rng.split_rng (rad' * 2 * rad' * 2) rng
   let vs0 = (map (\i -> if i == -1
                         then {dir={x=0, y=0}, spin=0}
                         else unsafe ether_flat[i]) is)
-  let vs = if click_kind == 1
-           then map2 randomise_angle rngs0 vs0
-           else map2 invert_angle rngs0 vs0
-  in unflatten w h (scatter ether_flat is vs)
+  let (rngs, vs) =
+    match click_kind
+    case #randomise -> map2 randomise_angle rngs0 vs0 |> unzip
+    case #invert -> (rngs0, map invert_angle vs0)
+  in (rng.join_rng rngs,
+      unflatten h w (scatter ether_flat is vs))
 
-entry colour_at [w] [h] (ether: [w][h]ethon)
-      (xfrom: i32) (yfrom: i32) (xto: i32) (yto: i32) (diam: f32): [w][h]ethon =
+entry colour_at [h][w] (ether: [h][w]ethon)
+      (xfrom: i32) (yfrom: i32) (xto: i32) (yto: i32) (diam: f32): [h][w]ethon =
   let rad = diam / 2.0
   let rad' = t32 rad
   let ether_flat = copy (flatten ether)
@@ -113,14 +106,14 @@ entry colour_at [w] [h] (ether: [w][h]ethon)
                 then let x' = xto + xd
                      let y' = yto + yd
                      in if x' >= 0 && x' < w && y' >= 0 && y' < h
-                        then x' * h + y'
+                        then y' * w + x'
                         else -1
                 else -1
   let f xfd yfd = if f32.sqrt(r32 xfd**2 + r32 yfd**2) < rad
                   then let x' = xfrom + xfd
                        let y' = yfrom + yfd
                        in if x' >= 0 && x' < w && y' >= 0 && y' < h
-                          then x' * h + y'
+                          then y' * w + x'
                           else -1
                   else -1
   let is = flatten (map (\xd -> map (\yd -> i xd yd) (-rad'..<rad')) (-rad'..<rad'))
@@ -132,23 +125,94 @@ entry colour_at [w] [h] (ether: [w][h]ethon)
                         then {dir={x=0, y=0}, spin=0}
                         else unsafe ether_flat[f]) fs)
   let vs = map2 colour_from fs0 vs0
-  in unflatten w h (scatter ether_flat is vs)
+  in unflatten h w (scatter ether_flat is vs)
 
-entry shuffle_ethons [w] [h] (ether: [w][h]ethon) (seed: i32): [w][h]ethon =
-  let rngs = rngs seed (w*h) |> unflatten w h
-  in map2 shuffle.shuffle' rngs ether |> map (.2)
+let shuffle_ethons [h][w] (ether: [h][w]ethon) (rng: rng.rng): (rng.rng, [h][w]ethon) =
+  let rngs = rng.split_rng (w*h) rng |> unflatten h w
+  let (rngs, ether) = map2 shuffle.shuffle' rngs ether |> unzip
+  in (rng.join_rng (flatten rngs), ether)
 
 import "lib/github.com/diku-dk/sorts/radix_sort"
 
-entry order_ethons [w] [h] (ether: [w][h]ethon): [w][h]ethon =
+let order_ethons [h][w] (ether: [h][w]ethon): [h][w]ethon =
   let order = radix_sort_by_key ethon_angle f32.num_bits f32.get_bit
   in map order ether
 
-let randomise_spin rng (e: ethon): ethon =
-  let (_rng, spin) = norm_dist.rand {mean=0, stddev=0.05} rng
-  in {dir=e.dir,
-      spin=spin}
+let randomise_spin rng (e: ethon): (rng.rng, ethon) =
+  let (rng, spin) = norm_dist.rand {mean=0, stddev=0.05} rng
+  in (rng, {dir=e.dir, spin=spin})
 
-entry randomise_spins [w] [h] (ether: [w][h]ethon) (seed: i32): [w][h]ethon =
-  let rngs = rngs seed (w*h) |> unflatten w h
-  in map2 (map2 randomise_spin) rngs ether
+let randomise_spins [h][w] (ether: [h][w]ethon) (rng: rng.rng): (rng.rng, [h][w]ethon) =
+  let rngs = rng.split_rng (w*h) rng |> unflatten h w
+  let (rngs, ether) = map2 (map2 randomise_spin) rngs ether |> map unzip |> unzip
+  in (rng.join_rng (flatten rngs), ether)
+
+import "lib/github.com/diku-dk/lys/lys"
+
+type text_content = (f32, i32)
+module lys: lys with text_content = text_content = {
+  type text_content = text_content
+
+  type state = {ethons: [][]ethon,
+                brush: i32,
+                rng: rng.rng,
+                dragging: {active: bool, x: i32, y: i32}
+               }
+
+  let init (h: i32) (w: i32): state =
+    let seed = h * w
+    let (rngs, ethons) = rng.split_rng (w*h) (rng.rng_from_seed [seed])
+                         |> map random_ethon
+                         |> unzip
+    in {ethons=unflatten h w ethons,
+        brush=200,
+        rng = rng.join_rng rngs,
+        dragging = {active=false, x=0, y=0}}
+
+  let resize h w (s: state) = init h w with brush = s.brush
+                                       with rng = s.rng
+
+  let key (e: key_event) (key: i32) (s: state) =
+    match e
+    case #keydown ->
+      if      key == 'r'
+      then let (rng, ethons) = shuffle_ethons s.ethons s.rng
+           in s with rng = rng with ethons = ethons
+      else if key == 's'
+      then let (rng, ethons) = randomise_spins s.ethons s.rng
+           in s with rng = rng with ethons = ethons
+      else if key == 'o'
+      then let ethons = order_ethons s.ethons
+           in s with ethons = ethons
+      else s
+    case #keyup ->
+      s
+
+  let mouse (mouse: i32) (x: i32) (y: i32) (s: state) =
+    if mouse == 0b001 || mouse == 0b100
+    then let kind = if mouse == 0b001 then #randomise else #invert
+         let (rng, ethons) = click_at s.ethons x y kind (r32 s.brush) s.rng
+         in s with rng = rng with ethons = ethons
+    else if mouse == 0b101
+    then let ethons = if s.dragging.active then
+                        colour_at s.ethons s.dragging.x s.dragging.y x y (r32 s.brush)
+                      else s.ethons
+         in s with ethons = ethons with dragging = {active=true, x, y}
+    else s with dragging = {active=false, x, y}
+
+  let wheel _ y (s: state) = s with brush = i32.max 0 (s.brush + y)
+
+  let step _ s: state =
+    s with ethons=iterate 10 step' s.ethons
+      with rng = (rng.rand s.rng).1
+
+  let render (s: state) =
+    map (map render_ethon) s.ethons
+
+  let text_format = "FPS: %.2f\nBrush: %d"
+
+  let text_content (render_duration: f32) (s: state): text_content =
+    (1000/render_duration, s.brush)
+
+  let text_colour = const argb.white
+}
