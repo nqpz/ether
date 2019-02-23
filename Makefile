@@ -1,16 +1,6 @@
-.PHONY: all run clean
+PROGNAME=ether
 
-all: ether.py
-
-run: ether.py
-	python3 ether-gui.py
-
-ether.py: ether.fut functions/*.fut lib
-	futhark pyopencl --library ether.fut
+include lib/github.com/diku-dk/lys/common.mk
 
 lib: futhark.pkg
 	futhark pkg sync
-
-clean:
-	rm -f ether.py
-	rm -rf __pycache__
