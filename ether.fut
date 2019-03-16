@@ -202,6 +202,8 @@ module lys: lys with text_content = text_content = {
 
   let wheel _ y (s: state) = s with brush = i32.max 0 (s.brush + y)
 
+  let grab_mouse = false
+
   let step _ s: state =
     s with ethons=iterate 10 step' s.ethons
       with rng = (rng.rand s.rng).1
