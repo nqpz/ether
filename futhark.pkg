@@ -3,5 +3,5 @@ require {
   github.com/diku-dk/cpprandom 1.1.4 #7dd47f3f2f5a8fa24d6847b34d9f8a9091b5d94a
   github.com/athas/vector 0.2.3 #91d8983c45d12c63cebecf2ffb73a2bd3b7215ed
   github.com/diku-dk/sorts 0.3.3 #5114be4c7140ac6ce56c8cbe8298b7df1152ab18
-  github.com/diku-dk/lys 0.0.0-20190316153911+57cffdea51b2ae7f3d133f1bcdf031f75477aee1 #57cffdea51b2ae7f3d133f1bcdf031f75477aee1
+  github.com/diku-dk/lys 0.0.0-20190319164701+78d07a23f6900d69f31c13ecfbbd25592fa90155 #78d07a23f6900d69f31c13ecfbbd25592fa90155
 }

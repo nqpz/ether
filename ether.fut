@@ -213,8 +213,8 @@ module lys: lys with text_content = text_content = {
 
   let text_format = "FPS: %.2f\nBrush: %d"
 
-  let text_content (render_duration: f32) (s: state): text_content =
-    (1000/render_duration, s.brush)
+  let text_content (fps: f32) (s: state): text_content =
+    (fps, s.brush)
 
   let text_colour = const argb.white
 }
