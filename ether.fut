@@ -149,7 +149,7 @@ let randomise_spins [h][w] (ether: [h][w]ethon) (rng: rng.rng): (rng.rng, [h][w]
 
 import "lib/github.com/diku-dk/lys/lys"
 
-type text_content = (f32, i32)
+type text_content = (i32, i32)
 module lys: lys with text_content = text_content = {
   type text_content = text_content
 
@@ -211,10 +211,10 @@ module lys: lys with text_content = text_content = {
   let render (s: state) =
     map (map render_ethon) s.ethons
 
-  let text_format = "FPS: %.2f\nBrush: %d"
+  let text_format = "FPS: %d\nBrush: %d"
 
   let text_content (fps: f32) (s: state): text_content =
-    (fps, s.brush)
+    (t32 fps, s.brush)
 
   let text_colour = const argb.white
 }
