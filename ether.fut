@@ -128,7 +128,7 @@ entry colour_at [h][w] (ether: [h][w]ethon)
   in unflatten h w (scatter ether_flat is vs)
 
 let shuffle_ethons [h][w] (ether: [h][w]ethon) (rng: rng.rng): (rng.rng, [h][w]ethon) =
-  let rngs = rng.split_rng (w*h) rng |> unflatten h w
+  let rngs = rng.split_rng (h*w) rng |> unflatten h w
   let (rngs, ether) = map2 shuffle.shuffle' rngs ether |> unzip
   in (rng.join_rng (flatten rngs), ether)
 
@@ -143,7 +143,7 @@ let randomise_spin rng (e: ethon): (rng.rng, ethon) =
   in (rng, {dir=e.dir, spin=spin})
 
 let randomise_spins [h][w] (ether: [h][w]ethon) (rng: rng.rng): (rng.rng, [h][w]ethon) =
-  let rngs = rng.split_rng (w*h) rng |> unflatten h w
+  let rngs = rng.split_rng (h*w) rng |> unflatten h w
   let (rngs, ether) = map2 (map2 randomise_spin) rngs ether |> map unzip |> unzip
   in (rng.join_rng (flatten rngs), ether)
 
@@ -160,7 +160,7 @@ module lys: lys with text_content = text_content = {
                }
 
   let init (seed: i32) (h: i32) (w: i32): state =
-    let (rngs, ethons) = rng.split_rng (w*h) (rng.rng_from_seed [seed])
+    let (rngs, ethons) = rng.split_rng (h*w) (rng.rng_from_seed [seed])
                          |> map random_ethon
                          |> unzip
     in {ethons=unflatten h w ethons,
@@ -169,7 +169,7 @@ module lys: lys with text_content = text_content = {
         dragging = {active=false, x=0, y=0}}
 
   let resize h w (s: state) =
-    let (rngs, ethons) = rng.split_rng (w*h) s.rng
+    let (rngs, ethons) = rng.split_rng (h*w) s.rng
                          |> map random_ethon
                          |> unzip
     in s with ethons = unflatten h w ethons
