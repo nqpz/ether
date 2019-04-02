@@ -159,8 +159,7 @@ module lys: lys with text_content = text_content = {
                 dragging: {active: bool, x: i32, y: i32}
                }
 
-  let init (h: i32) (w: i32): state =
-    let seed = h * w
+  let init (seed: i32) (h: i32) (w: i32): state =
     let (rngs, ethons) = rng.split_rng (w*h) (rng.rng_from_seed [seed])
                          |> map random_ethon
                          |> unzip
@@ -169,8 +168,12 @@ module lys: lys with text_content = text_content = {
         rng = rng.join_rng rngs,
         dragging = {active=false, x=0, y=0}}
 
-  let resize h w (s: state) = init h w with brush = s.brush
-                                       with rng = s.rng
+  let resize h w (s: state) =
+    let (rngs, ethons) = rng.split_rng (w*h) s.rng
+                         |> map random_ethon
+                         |> unzip
+    in s with ethons = unflatten h w ethons
+         with rng = rng.join_rng rngs
 
   let key (e: key_event) (key: i32) (s: state) =
     match e
