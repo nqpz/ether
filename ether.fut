@@ -160,8 +160,8 @@ module lys: lys with text_content = text_content = {
                 dragging: {active: bool, x: i32, y: i32}
                }
 
-  let init (seed: i32) (h: i32) (w: i32): state =
-    let (rngs, ethons) = rnge.split_rng (h*w) (rnge.rng_from_seed [seed])
+  let init (seed: u32) (h: i32) (w: i32): state =
+    let (rngs, ethons) = rnge.split_rng (h*w) (rnge.rng_from_seed [i32.u32 seed])
                          |> map random_ethon
                          |> unzip
     in {ethons=unflatten h w ethons,
@@ -206,9 +206,9 @@ module lys: lys with text_content = text_content = {
 
   let grab_mouse = false
 
-  let step s: state =
+  let step (s: state) =
     s with ethons=iterate 10 step' s.ethons
-      with rng = (rnge.rand s.rng).1
+      with rng = (rnge.rand s.rng).0
 
   let move (x: i32, y: i32) (dx,dy) = (x+dx, y+dy)
 
@@ -226,7 +226,7 @@ module lys: lys with text_content = text_content = {
   let render (s: state) =
     map (map render_ethon) s.ethons
 
-  let text_format = "FPS: %d\nBrush: %d"
+  let text_format () = "FPS: %d\nBrush: %d"
 
   let text_content (fps: f32) (s: state): text_content =
     (t32 fps, s.brush)
