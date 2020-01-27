@@ -154,11 +154,11 @@ type text_content = (i32, i32)
 module lys: lys with text_content = text_content = {
   type text_content = text_content
 
-  type state = {ethons: [][]ethon,
-                brush: i32,
-                rng: rng,
-                dragging: {active: bool, x: i32, y: i32}
-               }
+  type~ state = {ethons: [][]ethon,
+                 brush: i32,
+                 rng: rng,
+                 dragging: {active: bool, x: i32, y: i32}
+                }
 
   let init (seed: u32) (h: i32) (w: i32): state =
     let (rngs, ethons) = rnge.split_rng (h*w) (rnge.rng_from_seed [i32.u32 seed])
