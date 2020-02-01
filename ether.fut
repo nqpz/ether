@@ -86,8 +86,10 @@ let click_at [h][w] (ether: [h][w]ethon)
                         then y' * w + x'
                         else -1
                 else -1
-  let is = flatten (map (\xd -> map (\yd -> i xd yd) (-rad'..<rad')) (-rad'..<rad'))
-  let rngs0 = rnge.split_rng (rad' * 2 * rad' * 2) rng
+  let rads = (-rad'..<rad')
+  let is_length = (rad' * 2 * rad' * 2)
+  let is = flatten (map (\xd -> map (\yd -> i xd yd) rads) rads) :> [is_length]i32
+  let rngs0 = rnge.split_rng is_length rng
   let vs0 = (map (\i -> if i == -1
                         then {dir={x=0, y=0}, spin=0}
                         else unsafe ether_flat[i]) is)
@@ -117,11 +119,11 @@ entry colour_at [h][w] (ether: [h][w]ethon)
                           then y' * w + x'
                           else -1
                   else -1
-  let is = flatten (map (\xd -> map (\yd -> i xd yd) (-rad'..<rad')) (-rad'..<rad'))
+  let rads = (-rad'..<rad')
+  let (is, fs) = unzip (flatten (map (\xd -> map (\yd -> (i xd yd, f xd yd)) rads) rads))
   let vs0 = (map (\i -> if i == -1
                         then {dir={x=0, y=0}, spin=0}
                         else unsafe ether_flat[i]) is)
-  let fs = flatten (map (\xd -> map (\yd -> f xd yd) (-rad'..<rad')) (-rad'..<rad'))
   let fs0 = (map (\f -> if f == -1
                         then {dir={x=0, y=0}, spin=0}
                         else unsafe ether_flat[f]) fs)
