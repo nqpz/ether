@@ -92,7 +92,7 @@ let click_at [h][w] (ether: [h][w]ethon)
   let rngs0 = rnge.split_rng is_length rng
   let vs0 = (map (\i -> if i == -1
                         then {dir={x=0, y=0}, spin=0}
-                        else unsafe ether_flat[i]) is)
+                        else #[unsafe] ether_flat[i]) is)
   let (rngs, vs) =
     match click_kind
     case #randomise -> map2 randomise_angle rngs0 vs0 |> unzip
@@ -123,10 +123,10 @@ entry colour_at [h][w] (ether: [h][w]ethon)
   let (is, fs) = unzip (flatten (map (\xd -> map (\yd -> (i xd yd, f xd yd)) rads) rads))
   let vs0 = (map (\i -> if i == -1
                         then {dir={x=0, y=0}, spin=0}
-                        else unsafe ether_flat[i]) is)
+                        else #[unsafe] ether_flat[i]) is)
   let fs0 = (map (\f -> if f == -1
                         then {dir={x=0, y=0}, spin=0}
-                        else unsafe ether_flat[f]) fs)
+                        else #[unsafe] ether_flat[f]) fs)
   let vs = map2 colour_from fs0 vs0
   in unflatten h w (scatter ether_flat is vs)
 
