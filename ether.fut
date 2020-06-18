@@ -88,7 +88,7 @@ let click_at [h][w] (ether: [h][w]ethon)
                 else -1
   let rads = (-rad'..<rad')
   let is_length = (rad' * 2 * rad' * 2)
-  let is = flatten (map (\xd -> map (\yd -> i xd yd) rads) rads) :> [is_length]i32
+  let is = flatten_to is_length (map (\xd -> map (\yd -> i xd yd) rads) rads)
   let rngs0 = rnge.split_rng is_length rng
   let vs0 = (map (\i -> if i == -1
                         then {dir={x=0, y=0}, spin=0}
