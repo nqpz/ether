@@ -80,14 +80,14 @@ let click_at [h][w] (ether: [h][w]ethon)
   let rad' = t32 rad
   let ether_flat = copy (flatten ether)
   let i xd yd = if f32.sqrt(r32 xd**2 + r32 yd**2) < rad
-                then let x' = x + xd
-                     let y' = y + yd
+                then let x' = i64.i32 (x + xd)
+                     let y' = i64.i32 (y + yd)
                      in if x' >= 0 && x' < w && y' >= 0 && y' < h
                         then y' * w + x'
                         else -1
                 else -1
   let rads = (-rad'..<rad')
-  let is_length = (rad' * 2 * rad' * 2)
+  let is_length = i64.i32 (rad' * 2 * rad' * 2)
   let is = flatten_to is_length (map (\xd -> map (\yd -> i xd yd) rads) rads)
   let rngs0 = rnge.split_rng is_length rng
   let vs0 = (map (\i -> if i == -1
@@ -106,15 +106,15 @@ entry colour_at [h][w] (ether: [h][w]ethon)
   let rad' = t32 rad
   let ether_flat = copy (flatten ether)
   let i xd yd = if f32.sqrt(r32 xd**2 + r32 yd**2) < rad
-                then let x' = xto + xd
-                     let y' = yto + yd
+                then let x' = i64.i32 (xto + xd)
+                     let y' = i64.i32 (yto + yd)
                      in if x' >= 0 && x' < w && y' >= 0 && y' < h
                         then y' * w + x'
                         else -1
                 else -1
   let f xfd yfd = if f32.sqrt(r32 xfd**2 + r32 yfd**2) < rad
-                  then let x' = xfrom + xfd
-                       let y' = yfrom + yfd
+                  then let x' = i64.i32 (xfrom + xfd)
+                       let y' = i64.i32 (yfrom + yfd)
                        in if x' >= 0 && x' < w && y' >= 0 && y' < h
                           then y' * w + x'
                           else -1
@@ -162,7 +162,7 @@ module lys: lys with text_content = text_content = {
                  dragging: {active: bool, x: i32, y: i32}
                 }
 
-  let init (seed: u32) (h: i32) (w: i32): state =
+  let init (seed: u32) (h: i64) (w: i64): state =
     let (rngs, ethons) = rnge.split_rng (h*w) (rnge.rng_from_seed [i32.u32 seed])
                          |> map random_ethon
                          |> unzip
