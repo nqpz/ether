@@ -75,30 +75,30 @@ let colour_from (efrom: ethon) (e: ethon): ethon =
 type click_kind = #randomise | #invert
 
 let click_at [h][w] (ether: [h][w]ethon)
-      (x: i32) (y: i32) (click_kind: click_kind) (diam: f32) (rng: rng): (rng, [h][w]ethon) =
+      (x: i64) (y: i64) (click_kind: click_kind) (diam: f32) (rng: rng): (rng, [h][w]ethon) =
   let rad = diam / 2.0
-  let rad' = t32 rad
+  let rad' = i64.f32 rad
   let ether_flat = copy (flatten ether)
-  let i xd yd = if f32.sqrt(r32 xd**2 + r32 yd**2) < rad
-                then let x' = i64.i32 (x + xd)
-                     let y' = i64.i32 (y + yd)
+  let i xd yd = if f32.sqrt(f32.i64 xd**2 + f32.i64 yd**2) < rad
+                then let x' = x + xd
+                     let y' = y + yd
                      in if x' >= 0 && x' < w && y' >= 0 && y' < h
                         then y' * w + x'
                         else -1
                 else -1
-  let rads = (-rad'..<rad')
-  let is_length = i64.i32 (rad' * 2 * rad' * 2)
-  let is = flatten_to is_length (map (\xd -> map (\yd -> i xd yd) rads) rads)
-  let rngs0 = rnge.split_rng is_length rng
-  let vs0 = (map (\i -> if i == -1
-                        then {dir={x=0, y=0}, spin=0}
-                        else #[unsafe] ether_flat[i]) is)
+  let rads_length = rad' * 2
+  let rads = map (\k -> k - rad') (0..<rads_length)
+  let is = flatten (map (\xd -> map (\yd -> i xd yd) rads) rads)
+  let rngs0 = rnge.split_rng (rads_length * rads_length) rng
+  let vs0 = map (\i -> if i == -1
+                       then {dir={x=0, y=0}, spin=0}
+                       else #[unsafe] ether_flat[i]) is
   let (rngs, vs) =
     match click_kind
     case #randomise -> map2 randomise_angle rngs0 vs0 |> unzip
     case #invert -> (rngs0, map invert_angle vs0)
   in (rnge.join_rng rngs,
-      unflatten h w (scatter ether_flat is vs))
+      unflatten (scatter ether_flat is vs))
 
 entry colour_at [h][w] (ether: [h][w]ethon)
       (xfrom: i32) (yfrom: i32) (xto: i32) (yto: i32) (diam: f32): [h][w]ethon =
@@ -128,10 +128,10 @@ entry colour_at [h][w] (ether: [h][w]ethon)
                         then {dir={x=0, y=0}, spin=0}
                         else #[unsafe] ether_flat[f]) fs)
   let vs = map2 colour_from fs0 vs0
-  in unflatten h w (scatter ether_flat is vs)
+  in unflatten (scatter ether_flat is vs)
 
 let shuffle_ethons [h][w] (ether: [h][w]ethon) (rng: rng): (rng, [h][w]ethon) =
-  let rngs = rnge.split_rng (h*w) rng |> unflatten h w
+  let rngs = rnge.split_rng (h*w) rng |> unflatten
   let (rngs, ether) = map2 shuffle.shuffle' rngs ether |> unzip
   in (rnge.join_rng (flatten rngs), ether)
 
@@ -146,7 +146,7 @@ let randomise_spin rng (e: ethon): (rng, ethon) =
   in (rng, {dir=e.dir, spin=spin})
 
 let randomise_spins [h][w] (ether: [h][w]ethon) (rng: rng): (rng, [h][w]ethon) =
-  let rngs = rnge.split_rng (h*w) rng |> unflatten h w
+  let rngs = rnge.split_rng (h*w) rng |> unflatten
   let (rngs, ether) = map2 (map2 randomise_spin) rngs ether |> map unzip |> unzip
   in (rnge.join_rng (flatten rngs), ether)
 
@@ -166,7 +166,7 @@ module lys: lys with text_content = text_content = {
     let (rngs, ethons) = rnge.split_rng (h*w) (rnge.rng_from_seed [i32.u32 seed])
                          |> map random_ethon
                          |> unzip
-    in {ethons=unflatten h w ethons,
+    in {ethons=unflatten ethons,
         brush=200,
         rng = rnge.join_rng rngs,
         dragging = {active=false, x=0, y=0}}
@@ -175,7 +175,7 @@ module lys: lys with text_content = text_content = {
     let (rngs, ethons) = rnge.split_rng (h*w) s.rng
                          |> map random_ethon
                          |> unzip
-    in s with ethons = unflatten h w ethons
+    in s with ethons = unflatten ethons
          with rng = rnge.join_rng rngs
 
   let keydown (key: i32) (s: state) =
@@ -195,7 +195,7 @@ module lys: lys with text_content = text_content = {
   let mouse (mouse: i32) (x: i32) (y: i32) (s: state) =
     if mouse == 0b001 || mouse == 0b100
     then let kind = if mouse == 0b001 then #randomise else #invert
-         let (rng, ethons) = click_at s.ethons x y kind (r32 s.brush) s.rng
+         let (rng, ethons) = click_at s.ethons (i64.i32 x) (i64.i32 y) kind (r32 s.brush) s.rng
          in s with rng = rng with ethons = ethons
     else if mouse == 0b101
     then let ethons = if s.dragging.active then
